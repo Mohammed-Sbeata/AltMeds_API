@@ -132,6 +132,28 @@ JWT_SECRET=your_secret_key
 npm run dev
 ```
 
+### ✅ Tech Stack
+- Node.js
+
+- Express.js
+
+- MongoDB (native driver)
+
+- JWT (Authentication)
+
+- Joi (Input Validation)
+
+### 👨‍🔧 Developer Notes
+- The API follows a clear MVC-like folder structure.
+
+- All sensitive routes are protected by JWT.
+
+- The project does not include a frontend – it's meant to be used as a backend API only.
+
+- You can connect this API to a mobile or web frontend later.
+
+
+
 ### 📬 Contact
 For suggestions or collaboration:
 - [Mohammed Sbeata](https://github.com/Mohammed-Sbeata)
