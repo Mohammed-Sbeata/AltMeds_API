@@ -1,4 +1,4 @@
-const { getDB } = require('../configurations');
+const {dbConnection} = require('../configurations')
 const { ObjectId } = require('mongodb');
 const { altMedicineValidator } = require('../validators');
 
@@ -12,8 +12,7 @@ class AltMedicine {
     }
 
     save(callback) {
-        const db = getDB();
-        db.collection('alternative_medicines').insertOne({
+        dbConnection.collection('alternative_medicines').insertOne({
             name: this.data.name,
             description: this.data.description || '',
             originalMedicineId: new ObjectId(this.data.originalMedicineId),
@@ -25,22 +24,19 @@ class AltMedicine {
     }
 
     static getAll() {
-        const db = getDB();
-        return db.collection('alternative_medicines')
+        return dbConnection.collection('alternative_medicines')
             .find({})
             .sort({ createdAt: -1 })
             .toArray();
     }
 
     static getById(id) {
-        const db = getDB();
-        return db.collection('alternative_medicines')
+        return dbConnection.collection('alternative_medicines')
             .findOne({ _id: new ObjectId(id) });
     }
 
     static update(id, data) {
-        const db = getDB();
-        return db.collection('alternative_medicines')
+        return dbConnection.collection('alternative_medicines')
             .updateOne(
                 { _id: new ObjectId(id) },
                 {
@@ -56,8 +52,7 @@ class AltMedicine {
     }
 
     static delete(id) {
-        const db = getDB();
-        return db.collection('alternative_medicines')
+        return dbConnection.collection('alternative_medicines')
             .deleteOne({ _id: new ObjectId(id) })
             .then(result => ({ deleted: result.deletedCount > 0 }));
     }

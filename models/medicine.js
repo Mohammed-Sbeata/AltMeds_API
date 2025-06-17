@@ -1,4 +1,4 @@
-const { getDB } = require('../configurations');
+const {dbConnection} = require('../configurations')
 const { ObjectId } = require('mongodb');
 const { medicineValidator } = require('../validators');
 
@@ -12,8 +12,7 @@ class Medicine {
     }
 
     save(callback) {
-        const db = getDB();
-        db.collection('medicines').insertOne({
+        dbConnection.collection('medicines').insertOne({
             name: this.data.name,
             description: this.data.description || '',
             createdAt: new Date()
@@ -27,39 +26,56 @@ class Medicine {
     }
 
     static getAll() {
-        const db = getDB();
-        return db.collection('medicines')
+        return dbConnection.collection('medicines')
             .find({})
             .sort({ createdAt: -1 })
             .toArray();
     }
 
     static getById(id) {
-        const db = getDB();
-        return db.collection('medicines').findOne({ _id: new ObjectId(id) });
+        return dbConnection.collection('medicines').findOne({ _id: new ObjectId(id) });
     }
 
-    static update(id, data) {
-        const db = getDB();
-        return db.collection('medicines').updateOne(
-            { _id: new ObjectId(id) },
-            {
-                $set: {
-                    name: data.name,
-                    description: data.description || ''
+    // static update(id, data) {
+    //     return dbConnection.collection('medicines').updateOne(
+    //         { _id: new ObjectId(id) },
+    //         {
+    //             $set: {
+    //                 name: data.name,
+    //                 description: data.description || ''
+    //             }
+    //         }
+    //     ).then(result => ({
+    //         modified: result.modifiedCount > 0
+    //     }));
+    // }
+    static update(id, updateData) {
+        return new Promise((resolve, reject) => {
+            dbConnection('medicines', async (collection) => {
+                try {
+                    const result = await collection.updateOne(
+                        { _id: new ObjectId(id) },
+                        { $set: updateData }
+                    );
+                    resolve({ modified: result.modifiedCount > 0 });
+                } catch (err) {
+                    reject(err);
                 }
-            }
-        ).then(result => ({
-            modified: result.modifiedCount > 0
-        }));
+            });
+        });
     }
 
     static delete(id) {
-        const db = getDB();
-        return db.collection('medicines').deleteOne({ _id: new ObjectId(id) })
-            .then(result => ({
-                deleted: result.deletedCount > 0
-            }));
+        return new Promise((resolve, reject) => {
+            dbConnection('medicines', async (collection) => {
+                try {
+                    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+                    resolve({ deleted: result.deletedCount > 0 });
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
     }
 }
 
