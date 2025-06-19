@@ -11,17 +11,17 @@ class Medicine {
         return medicineValidator.validate(data);
     }
 
-    save(callback) {
+    save(cb) {
         dbConnection.collection('medicines').insertOne({
             name: this.data.name,
             description: this.data.description || '',
             createdAt: new Date()
         })
         .then(result => {
-            callback({ status: true, _id: result.insertedId });
+            cb({ status: true, _id: result.insertedId });
         })
         .catch(err => {
-            callback({ status: false, message: err.message });
+            cb({ status: false, message: err.message });
         });
     }
 

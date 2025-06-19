@@ -34,7 +34,7 @@ class Manager {
     static logout() {
         return {
             status: true,
-            message: 'Logout successful. Please delete token on client side.'
+            message: 'Logout successful.'
         };
     }
 }

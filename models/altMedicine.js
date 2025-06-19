@@ -11,7 +11,7 @@ class AltMedicine {
         return altMedicineValidator.validate(data);
     }
 
-    save(callback) {
+    save(cb) {
         dbConnection.collection('alternative_medicines').insertOne({
             name: this.data.name,
             description: this.data.description || '',
@@ -19,8 +19,8 @@ class AltMedicine {
             pharmacyIds: (this.data.pharmacyIds || []).map(id => new ObjectId(id)),
             createdAt: new Date()
         })
-        .then(result => callback({ status: true, _id: result.insertedId }))
-        .catch(err => callback({ status: false, message: err.message }));
+        .then(result => cb({ status: true, _id: result.insertedId }))
+        .catch(err => cb({ status: false, message: err.message }));
     }
 
     static getAll() {

@@ -8,13 +8,13 @@ class Pharmacy {
     }
 
     // إنشاء صيدلية جديدة
-    save(callback) {
+    save(cb) {
         dbConnection('pharmacies', async (collection) => {
             try {
                 const result = await collection.insertOne(this.pharmacyData);
-                callback({ status: true, _id: result.insertedId });
+                cb({ status: true, _id: result.insertedId });
             } catch (err) {
-                callback({ status: false, message: err.message });
+                cb({ status: false, message: err.message });
             }
         });
     }
