@@ -1,8 +1,7 @@
 const createError = require('http-errors');
 const Pharmacy = require('../models');
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('bson');
 
-// ➕ إضافة صيدلية
 const createPharmacy = (req, res, next) => {
     const validation = Pharmacy.validate(req.body);
     if (validation.error) {
@@ -23,7 +22,6 @@ const createPharmacy = (req, res, next) => {
     });
 };
 
-// 📄 عرض كل الصيدليات
 const getAllPharmacies = (req, res, next) => {
     Pharmacy.getAll()
         .then(pharmacies => {
@@ -34,7 +32,6 @@ const getAllPharmacies = (req, res, next) => {
         });
 };
 
-// 📄 عرض صيدلية حسب ID
 const getPharmacyById = (req, res, next) => {
     const { id } = req.params;
 
@@ -50,7 +47,6 @@ const getPharmacyById = (req, res, next) => {
         .catch(err => next(createError(500, err.message)));
 };
 
-// ✏️ تعديل صيدلية
 const updatePharmacy = (req, res, next) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {

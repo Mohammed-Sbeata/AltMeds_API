@@ -1,6 +1,6 @@
 const { dbConnection } = require('../configurations');
 const { pharmacyValidator } = require('../validators');
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('bson');
 
 class Pharmacy {
     constructor(data) {

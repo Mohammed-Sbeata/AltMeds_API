@@ -1,5 +1,5 @@
 const {dbConnection} = require('../configurations')
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('bson');
 const { medicineValidator } = require('../validators');
 
 class Medicine {
@@ -26,55 +26,42 @@ class Medicine {
     }
 
     static getAll() {
-        return dbConnection.collection('medicines')
-            .find({})
-            .sort({ createdAt: -1 })
-            .toArray();
-    }
-
-    static getById(id) {
-        return dbConnection.collection('medicines').findOne({ _id: new ObjectId(id) });
-    }
-
-    // static update(id, data) {
-    //     return dbConnection.collection('medicines').updateOne(
-    //         { _id: new ObjectId(id) },
-    //         {
-    //             $set: {
-    //                 name: data.name,
-    //                 description: data.description || ''
-    //             }
-    //         }
-    //     ).then(result => ({
-    //         modified: result.modifiedCount > 0
-    //     }));
-    // }
-    static update(id, updateData) {
         return new Promise((resolve, reject) => {
-            dbConnection('medicines', async (collection) => {
-                try {
-                    const result = await collection.updateOne(
-                        { _id: new ObjectId(id) },
-                        { $set: updateData }
-                    );
-                    resolve({ modified: result.modifiedCount > 0 });
-                } catch (err) {
-                    reject(err);
-                }
-            });
+            dbConnection.collection('medicines').find().toArray()
+                .then(data => resolve(data))
+                .catch(err => reject(err));
         });
     }
 
-    static delete(id) {
+    static getById(id) {
         return new Promise((resolve, reject) => {
-            dbConnection('medicines', async (collection) => {
-                try {
-                    const result = await collection.deleteOne({ _id: new ObjectId(id) });
+            dbConnection.collection('medicines').findOne({ _id: new ObjectId(id) })
+                .then(data => resolve(data))
+                .catch(err => reject(err));
+        });
+    }
+
+     // تحديث دواء حسب ID
+    static update(id, newData) {
+        return new Promise((resolve, reject) => {
+            dbConnection.collection('medicines').updateOne(
+                { _id: new ObjectId(id) },
+                { $set: newData }
+            )
+                .then(result => {
+                    resolve({ modified: result.modifiedCount > 0 });
+                })
+                .catch(err => reject(err));
+        });
+    }
+
+       static delete(id) {
+        return new Promise((resolve, reject) => {
+            dbConnection.collection('medicines').deleteOne({ _id: new ObjectId(id) })
+                .then(result => {
                     resolve({ deleted: result.deletedCount > 0 });
-                } catch (err) {
-                    reject(err);
-                }
-            });
+                })
+                .catch(err => reject(err));
         });
     }
 }

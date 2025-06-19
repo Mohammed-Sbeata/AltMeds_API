@@ -1,6 +1,6 @@
 const createError = require('http-errors');
 const Medicine = require('../models/medicine');
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require('bson');
 
 // ➕ إضافة دواء مفقود
 const createMedicine = (req, res, next) => {
