@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middlewares');
+const {auth} = require('../middlewares');
 const {altMedicineController} = require('../controllers');
 
 // 🛡️ جميع المسارات محمية بالمدير (auth middleware)

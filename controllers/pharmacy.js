@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const Pharmacy = require('../models');
+const Pharmacy = require('../models/pharmacy');
 const { ObjectId } = require('bson');
 
 const createPharmacy = (req, res, next) => {

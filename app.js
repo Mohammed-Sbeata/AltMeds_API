@@ -1,42 +1,52 @@
-const express = require('express')
-const createError = require('http-errors')
+require('dotenv').config();
+const express = require('express');
+const createError = require('http-errors');
+const { returnJson } = require('./my_modules/json_response');
+const middleware = require('./middlewares');
+const routes = require('./routes');
+const cookieParser = require('cookie-parser');
 
-const { returnJson } = require('./my_modules/json_response')
-global.returnJson = returnJson
-
-const middleware = require('./middlewares')
-const routes = require('./routes')
+global.returnJson = returnJson;
 
 const app = express();
 
+// إضافة ميدلوير لتحليل الكوكيز
+app.use(cookieParser());
+
 process.on('unhandledRejection', (reason) => {
-    process.exit(1)
-})
+    console.error('Unhandled Rejection:', reason);
+    process.exit(1);
+});
 
 /**
  * Middlewares
  */
 middleware.global(app);
 
-
 /**
  * Routes
  */
-routes(app)
+routes(app);
 
+// معالجة الأخطاء: صفحة غير موجودة (404)
 app.use((req, res, next) => {
     next(createError(404));
-})
+});
 
+// معالج الأخطاء العام مع ضبط statusCode افتراضي
 app.use((error, req, res, next) => {
-    console.log(error)
-    res.status(error.statusCode).json({
+    console.error(error);
+    res.status(error.statusCode || 500).json({
         status: {
             status: false,
-            message: error.message
+            message: error.message || 'Internal Server Error'
         }
-    })
-})
+    });
+});
 
+// تشغيل السيرفر بعد ضبط كل شيء
+app.listen(5000, () => {
+    console.log("Server running on port 5000");
+});
 
-module.exports = app
+module.exports = app;

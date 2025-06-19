@@ -1,38 +1,42 @@
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
-const { readFileSync } = require('fs');
-const Manager = require('../models');
+
+const privateKey = process.env.PRIVATE_KEY
 
 const login = (req, res, next) => {
-    Manager.login(req.body)
-        .then(result => {
-            if (result instanceof Error) {
-                return next(createError(result.statusCode, result.message));
-            }
+    const { username, password } = req.body;
 
-            const secretKey = readFileSync('./configurations/private.key');
-            const token = jwt.sign(
-                {
-                    _id: result._id,
-                    username: result.username
-                },
-                secretKey,
-                { expiresIn: '1d' } 
-            );
+    if (username === "manager" && password === "manager123") {
+        const payload = {
+            _id: 'fixed-manager-id',
+            role: 'admin'
+        };
 
-            res.status(200).json({
-                status: true,
-                token: token
-            });
-        })
-        .catch(err => {
-            next(createError(500, err.message));
+        const token = jwt.sign(payload, privateKey, { algorithm: 'HS256', expiresIn: '2h' });
+
+        res.cookie('token', token, {
+            httpOnly: true,     // لا يمكن الوصول من جافاسكريبت
+            secure: false,      // في بيئة التطوير خليها false، بالإنتاج خليها true مع HTTPS
+            maxAge: 2 * 60 * 60 * 1000, // ساعتين (مطابقة لصلاحية التوكن)
+            sameSite: 'Strict'  // يقي من هجمات CSRF
         });
+
+        return res.json({
+            status: true,
+            message: "تم تسجيل الدخول بنجاح",
+            token
+        });
+    }
+
+    return res.status(404).json({ status: false, message: "اسم المستخدم او كلمة المرور غير صحيحة" })
 };
 
 const logout = (req, res, next) => {
-    const result = Manager.logout();
-    res.status(200).json(result);
+    res.clearCookie('token');
+    return res.json({
+        status: true,
+        message: "تم تسجيل الخروج بنجاح"
+    });
 };
 
 module.exports = {

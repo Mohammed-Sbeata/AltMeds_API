@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const medicineController = require('../controllers');
-const auth = require('../middlewares'); // لحماية المسارات الخاصة بالإدارة
+const {medicineController} = require('../controllers');
+const {auth} = require('../middlewares'); // لحماية المسارات الخاصة بالإدارة
 
 // ➕ إضافة دواء مفقود (محمي)
 router.post('/addMedicine', auth, medicineController.createMedicine);

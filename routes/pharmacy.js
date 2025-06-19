@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const {pharmacyController} = require('../controllers');
-const auth = require('../middlewares'); 
+const {auth} = require('../middlewares'); 
 
 router.post('/addPharmacy', auth, pharmacyController.createPharmacy);
 
 router.get('/getAllPharmacies',auth,  pharmacyController.getAllPharmacies);
 
-router.get('/:id',auth, pharmacyController.getPharmacyById);
+router.get('/getPharmacyById/:id',auth, pharmacyController.getPharmacyById);
 
 router.put('/updatePharmacy/:id', auth, pharmacyController.updatePharmacy);
 
