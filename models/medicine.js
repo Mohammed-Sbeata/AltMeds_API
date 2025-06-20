@@ -1,68 +1,51 @@
-const {dbConnection} = require('../configurations')
+const { getDb } = require('../configurations');
 const { ObjectId } = require('bson');
 const { medicineValidator } = require('../validators');
 
 class Medicine {
     constructor(data) {
-        this.data = data;
+        this.medicineData = data;
+    }
+
+    save(callback) {
+        const db = getDb();
+        db.collection('medicines')
+            .insertOne(this.medicineData)
+            .then(result => {
+                callback({ status: true, _id: result.insertedId });
+            })
+            .catch(err => {
+                callback({ status: false, message: err.message });
+            });
+    }
+
+    static async getAll() {
+        const db = getDb();
+        return await db.collection('medicines').find().toArray();
+    }
+
+    static async getById(id) {
+        const db = getDb();
+        return await db.collection('medicines').findOne({ _id: new ObjectId(id) });
+    }
+
+    static async update(id, data) {
+        const db = getDb();
+        const result = await db.collection('medicines').updateOne(
+            { _id: new ObjectId(id) },
+            { $set: data }
+        );
+        return { modified: result.modifiedCount > 0 };
+    }
+
+    static async delete(id) {
+        const db = getDb();
+        const result = await db.collection('medicines').deleteOne({ _id: new ObjectId(id) });
+        return { deleted: result.deletedCount > 0 };
     }
 
     static validate(data) {
-        return medicineValidator.validate(data);
-    }
-
-    save(cb) {
-        dbConnection.collection('medicines').insertOne({
-            name: this.data.name,
-            description: this.data.description || '',
-            createdAt: new Date()
-        })
-        .then(result => {
-            cb({ status: true, _id: result.insertedId });
-        })
-        .catch(err => {
-            cb({ status: false, message: err.message });
-        });
-    }
-
-    static getAll() {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('medicines').find().toArray()
-                .then(data => resolve(data))
-                .catch(err => reject(err));
-        });
-    }
-
-    static getById(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('medicines').findOne({ _id: new ObjectId(id) })
-                .then(data => resolve(data))
-                .catch(err => reject(err));
-        });
-    }
-
-     // تحديث دواء حسب ID
-    static update(id, newData) {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('medicines').updateOne(
-                { _id: new ObjectId(id) },
-                { $set: newData }
-            )
-                .then(result => {
-                    resolve({ modified: result.modifiedCount > 0 });
-                })
-                .catch(err => reject(err));
-        });
-    }
-
-       static delete(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('medicines').deleteOne({ _id: new ObjectId(id) })
-                .then(result => {
-                    resolve({ deleted: result.deletedCount > 0 });
-                })
-                .catch(err => reject(err));
-        });
+        return medicineValidator.medicineValidator.validate(data, { abortEarly: false });
     }
 }
 

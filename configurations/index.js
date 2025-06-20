@@ -1,3 +1,6 @@
+const { connectToDb, getDb } = require('./db');
+
 module.exports = {
-    dbConnection: require('./db')
-}
+    connectToDb,
+    getDb
+};

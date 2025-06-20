@@ -44,9 +44,5 @@ app.use((error, req, res, next) => {
     });
 });
 
-// تشغيل السيرفر بعد ضبط كل شيء
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
-});
 
 module.exports = app;

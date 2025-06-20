@@ -1,73 +1,64 @@
-const {dbConnection} = require('../configurations')
+const { getDb } = require('../configurations');
 const { ObjectId } = require('bson');
-const { altMedicineValidator } = require('../validators');
+const  {altMedicineValidator}  = require('../validators');
 
 class AltMedicine {
     constructor(data) {
         this.data = data;
     }
 
+    // ✅ دالة التحقق
     static validate(data) {
-        return altMedicineValidator.validate(data);
+        return altMedicineValidator.altMedicineValidator.validate(data, { abortEarly: false });
     }
 
-    save(cb) {
-        dbConnection.collection('altMedicines').insertOne({
-            name: this.data.name,
-            description: this.data.description || '',
-            originalMedicineId: new ObjectId(this.data.originalMedicineId),
-            pharmacyIds: (this.data.pharmacyIds || []).map(id => new ObjectId(id)),
-            createdAt: new Date()
-        })
-        .then(result => cb({ status: true, _id: result.insertedId }))
-        .catch(err => cb({ status: false, message: err.message }));
+    save(callback) {
+        const db = getDb();
+        db.collection('altMedicines')
+            .insertOne({
+                name: this.data.name,
+                description: this.data.description || '',
+                originalMedicineId: new ObjectId(this.data.originalMedicineId),
+                pharmacyIds: (this.data.pharmacyIds || []).map(id => new ObjectId(id)),
+                createdAt: new Date()
+            })
+            .then(result => callback({ status: true, _id: result.insertedId }))
+            .catch(err => callback({ status: false, message: err.message }));
     }
 
-static getAll() {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('altMedicines').find().toArray()
-                .then(data => resolve(data))
-                .catch(err => reject(err));
-        });
+    static async getAll() {
+        const db = getDb();
+        return await db.collection('altMedicines').find().toArray();
     }
 
-    static getById(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('altMedicines').findOne({ _id: new ObjectId(id) })
-                .then(data => resolve(data))
-                .catch(err => reject(err));
-        });
+    static async getById(id) {
+        const db = getDb();
+        return await db.collection('altMedicines').findOne({ _id: new ObjectId(id) });
     }
 
+    static async update(id, data) {
+        const db = getDb();
 
-static update(id, newData) {
-        return new Promise((resolve, reject) => {
-            // تحويل missingMedicineId و pharmacies إلى ObjectId إذا موجودة
-            if (newData.missingMedicineId) {
-                newData.missingMedicineId = new ObjectId(newData.missingMedicineId);
-            }
-            if (newData.pharmacies && Array.isArray(newData.pharmacies)) {
-                newData.pharmacies = newData.pharmacies.map(id => new ObjectId(id));
-            }
+        if (data.originalMedicineId) {
+            data.originalMedicineId = new ObjectId(data.originalMedicineId);
+        }
 
-            dbConnection.collection('altMedicines').updateOne(
-                { _id: new ObjectId(id) },
-                { $set: newData }
-            )
-                .then(result => {
-                    resolve({ modified: result.modifiedCount > 0 });
-                })
-                .catch(err => reject(err));
-        });
+        if (Array.isArray(data.pharmacyIds)) {
+            data.pharmacyIds = data.pharmacyIds.map(id => new ObjectId(id));
+        }
+
+        const result = await db.collection('altMedicines').updateOne(
+            { _id: new ObjectId(id) },
+            { $set: data }
+        );
+
+        return { modified: result.modifiedCount > 0 };
     }
-static delete(id) {
-        return new Promise((resolve, reject) => {
-            dbConnection.collection('altMedicines').deleteOne({ _id: new ObjectId(id) })
-                .then(result => {
-                    resolve({ deleted: result.deletedCount > 0 });
-                })
-                .catch(err => reject(err));
-        });
+
+    static async delete(id) {
+        const db = getDb();
+        const result = await db.collection('altMedicines').deleteOne({ _id: new ObjectId(id) });
+        return { deleted: result.deletedCount > 0 };
     }
 }
 

@@ -1,22 +1,34 @@
 const { MongoClient } = require('mongodb');
+require('dotenv').config();
 
 const _uri = process.env.MONGODB_URI;
+const _dbName = 'AltMeds_API';
 
-const dbConnection = (collection, cb) => {
+let db = null;
+
+const connectToDb = async () => {
+    if (db) return db; // إذا الاتصال موجود، استخدمه
+
     if (!_uri) {
-        console.error('MONGODB_URI is not defined in environment variables.');
-        return;
+        throw new Error('❌ MONGODB_URI is not defined in environment variables.');
     }
 
-    MongoClient.connect(_uri)
-        .then(async (client) => {
-            const db = client.db('AltMeds_API').collection(collection);
-            await cb(db);
-            client.close();
-        })
-        .catch((err) => {
-            console.error('Database connection failed:', err);
-        });
+    const client = new MongoClient(_uri, {
+        useUnifiedTopology: true
+    });
+
+    await client.connect();
+    db = client.db(_dbName);
+    console.log('✅ Connected to MongoDB');
+    return db;
 };
 
-module.exports = dbConnection;
+module.exports = {
+    connectToDb,
+    getDb: () => {
+        if (!db) {
+            throw new Error('❌ Database not connected yet. Call connectToDb() first.');
+        }
+        return db;
+    }
+};

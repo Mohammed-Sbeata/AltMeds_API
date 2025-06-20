@@ -1,11 +1,12 @@
 const createError = require('http-errors');
-const Pharmacy = require('../models/pharmacy');
+const {Pharmacy} = require('../models');
 const { ObjectId } = require('bson');
 
+// 🔄 إنشاء صيدلية جديدة
 const createPharmacy = (req, res, next) => {
-    const validation = Pharmacy.validate(req.body);
-    if (validation.error) {
-        return next(createError(400, validation.error.message));
+    const { error } = Pharmacy.validate(req.body);
+    if (error) {
+        return next(createError(400, error.details[0].message));
     }
 
     const pharmacy = new Pharmacy(req.body);
@@ -14,7 +15,7 @@ const createPharmacy = (req, res, next) => {
             res.status(201).json({
                 status: true,
                 _id: status._id,
-                message: 'Pharmacy added successfully.'
+                message: 'تمت إضافة الصيدلية بنجاح.'
             });
         } else {
             next(createError(500, status.message));
@@ -22,67 +23,76 @@ const createPharmacy = (req, res, next) => {
     });
 };
 
-const getAllPharmacies = (req, res, next) => {
-    Pharmacy.getAll()
-        .then(pharmacies => {
-            res.status(200).json(pharmacies);
-        })
-        .catch(err => {
-            next(createError(500, err.message));
-        });
+// 📥 جلب جميع الصيدليات
+const getAllPharmacies = async (req, res, next) => {
+    try {
+        const pharmacies = await Pharmacy.getAll();
+        res.status(200).json(pharmacies);
+    } catch (err) {
+        next(createError(500, err.message));
+    }
 };
 
-const getPharmacyById = (req, res, next) => {
+// 📥 جلب صيدلية حسب ID
+const getPharmacyById = async (req, res, next) => {
     const { id } = req.params;
 
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'Invalid pharmacy ID'));
+        return next(createError(400, 'معرّف الصيدلية غير صالح'));
     }
 
-    Pharmacy.getById(id)
-        .then(pharmacy => {
-            if (!pharmacy) return next(createError(404, 'Pharmacy not found'));
-            res.status(200).json(pharmacy);
-        })
-        .catch(err => next(createError(500, err.message)));
+    try {
+        const pharmacy = await Pharmacy.getById(id);
+        if (!pharmacy) return next(createError(404, 'لم يتم العثور على الصيدلية'));
+        res.status(200).json(pharmacy);
+    } catch (err) {
+        next(createError(500, err.message));
+    }
 };
 
-const updatePharmacy = (req, res, next) => {
+// ✏️ تحديث صيدلية
+const updatePharmacy = async (req, res, next) => {
     const { id } = req.params;
+
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'Invalid pharmacy ID'));
+        return next(createError(400, 'معرّف الصيدلية غير صالح'));
     }
 
-    const validation = Pharmacy.validate(req.body);
-    if (validation.error) {
-        return next(createError(400, validation.error.message));
+    const { error } = Pharmacy.validate(req.body);
+    if (error) {
+        return next(createError(400, error.details[0].message));
     }
 
-    Pharmacy.update(id, req.body)
-        .then(result => {
-            if (!result.modified) {
-                return next(createError(404, 'Pharmacy not found or no changes made'));
-            }
-            res.status(200).json({ status: true, message: 'Pharmacy updated successfully' });
-        })
-        .catch(err => next(createError(500, err.message)));
+    try {
+        const result = await Pharmacy.update(id, req.body);
+        if (!result.modified) {
+            return next(createError(404, 'لم يتم العثور على الصيدلية أو لم يتم تعديلها'));
+        }
+
+        res.status(200).json({ status: true, message: 'تم تعديل بيانات الصيدلية بنجاح' });
+    } catch (err) {
+        next(createError(500, err.message));
+    }
 };
 
 // 🗑️ حذف صيدلية
-const deletePharmacy = (req, res, next) => {
+const deletePharmacy = async (req, res, next) => {
     const { id } = req.params;
+
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'Invalid pharmacy ID'));
+        return next(createError(400, 'معرّف الصيدلية غير صالح'));
     }
 
-    Pharmacy.delete(id)
-        .then(result => {
-            if (!result.deleted) {
-                return next(createError(404, 'Pharmacy not found'));
-            }
-            res.status(200).json({ status: true, message: 'Pharmacy deleted successfully' });
-        })
-        .catch(err => next(createError(500, err.message)));
+    try {
+        const result = await Pharmacy.delete(id);
+        if (!result.deleted) {
+            return next(createError(404, 'لم يتم العثور على الصيدلية'));
+        }
+
+        res.status(200).json({ status: true, message: 'تم حذف الصيدلية بنجاح' });
+    } catch (err) {
+        next(createError(500, err.message));
+    }
 };
 
 module.exports = {

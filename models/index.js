@@ -1,5 +1,5 @@
 module.exports = {
+    altMedicine: require('./altMedicine'),
     Pharmacy: require('./pharmacy'),
-    Medicine: require('./medicine'),
-    altMedicine: require('./altMedicine')
+    Medicine: require('./medicine')
 }
