@@ -15,27 +15,27 @@ const login = (req, res, next) => {
         const token = jwt.sign(payload, privateKey, { algorithm: 'HS256', expiresIn: '2h' });
 
         res.cookie('token', token, {
-            httpOnly: true,     // لا يمكن الوصول من جافاسكريبت
-            secure: false,      // في بيئة التطوير خليها false، بالإنتاج خليها true مع HTTPS
-            maxAge: 2 * 60 * 60 * 1000, // ساعتين (مطابقة لصلاحية التوكن)
-            sameSite: 'Strict'  // يقي من هجمات CSRF
+            httpOnly: true,     
+            secure: false,      
+            maxAge: 2 * 60 * 60 * 1000, 
+            sameSite: 'Strict'  
         });
 
         return res.json({
             status: true,
-            message: "تم تسجيل الدخول بنجاح",
+            message: "Login Successfully...",
             token
         });
     }
 
-    return res.status(404).json({ status: false, message: "اسم المستخدم او كلمة المرور غير صحيحة" })
+    return res.status(404).json({ status: false, message: 'UserName or Password Not Corrected ...' })
 };
 
 const logout = (req, res, next) => {
     res.clearCookie('token');
     return res.json({
         status: true,
-        message: "تم تسجيل الخروج بنجاح"
+        message: "Logout  Successfully..."
     });
 };
 

@@ -6,16 +6,16 @@ const medicineValidator = Joi.object({
         .max(100)
         .required()
         .messages({
-            'string.empty': 'اسم الدواء مطلوب',
-            'string.min': 'اسم الدواء قصير جدًا',
-            'string.max': 'اسم الدواء طويل جدًا'
+            'string.empty': 'Name Medicine is not empty',
+            'string.min': 'Name Medicine is too Min',
+            'string.max': 'Name Medicine is too Max'
         }),
 
     description: Joi.string()
         .max(1000)
         .allow('')
         .messages({
-            'string.max': 'الوصف طويل جدًا'
+            'string.max': 'Description Medicine is too Max'
         })
 });
 

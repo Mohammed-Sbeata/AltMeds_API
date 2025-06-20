@@ -1,8 +1,6 @@
 const {altMedicine, Medicine, Pharmacy}= require('../models');
 const createError = require('http-errors');
 
-
-// ➕ إنشاء دواء بديل
 const createAltMedicine = async (req, res, next) => {
     const { error } = altMedicine.validate(req.body);
     if (error) return next(createError(400, error.message));
@@ -24,7 +22,7 @@ const createAltMedicine = async (req, res, next) => {
         if (status.status) {
             res.status(201).json({
                 status: true,
-                message: 'تمت إضافة الدواء البديل بنجاح',
+                message: 'Alt_Medicine Added Sucsessfully...',
                 id: status._id
             });
         } else {
@@ -33,26 +31,23 @@ const createAltMedicine = async (req, res, next) => {
     });
 };
 
-// 📄 عرض كل الأدوية البديلة
 const getAllAltMedicines = (req, res, next) => {
     altMedicine.getAll()
         .then(data => res.status(200).json(data))
         .catch(err => next(createError(500, err.message)));
 };
 
-// 📄 عرض دواء بديل حسب ID
 const getAltMedicineById = (req, res, next) => {
     const id = req.params.id;
 
     altMedicine.getById(id)
         .then(data => {
-            if (!data) return next(createError(404, 'الدواء البديل غير موجود'));
+            if (!data) return next(createError(404, 'Alt_Medicine is not Exists...'));
             res.status(200).json(data);
         })
         .catch(err => next(createError(500, err.message)));
 };
 
-// ✏️ تعديل دواء بديل
 const updateAltMedicine = async (req, res, next) => {
     const id = req.params.id;
     const { error } = altMedicine.validate(req.body);
@@ -73,8 +68,8 @@ const updateAltMedicine = async (req, res, next) => {
 
     altMedicine.update(id, req.body)
         .then(result => {
-            if (!result.modified) return next(createError(404, 'الدواء البديل غير موجود أو لم يتم التعديل'));
-            res.status(200).json({ status: true, message: 'تم التعديل بنجاح' });
+            if (!result.modified) return next(createError(404, 'Alt_Medicine is not Exists Or Not Updated...'));
+            res.status(200).json({ status: true, message: 'Alt_Medicine Updated Sucsessfully...' });
         })
         .catch(err => next(createError(500, err.message)));
 };
@@ -85,8 +80,8 @@ const deleteAltMedicine = (req, res, next) => {
 
     altMedicine.delete(id)
         .then(result => {
-            if (!result.deleted) return next(createError(404, 'الدواء البديل غير موجود'));
-            res.status(200).json({ status: true, message: 'تم الحذف بنجاح' });
+            if (!result.deleted) return next(createError(404, 'Alt_Medicine is not Exists...'));
+            res.status(200).json({ status: true, message: 'Alt_Medicine Deleted Sucsessfully...' });
         })
         .catch(err => next(createError(500, err.message)));
 };

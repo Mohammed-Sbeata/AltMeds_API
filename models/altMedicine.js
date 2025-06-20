@@ -7,7 +7,6 @@ class AltMedicine {
         this.data = data;
     }
 
-    // ✅ دالة التحقق
     static validate(data) {
         return altMedicineValidator.altMedicineValidator.validate(data, { abortEarly: false });
     }

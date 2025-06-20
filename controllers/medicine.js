@@ -2,7 +2,6 @@ const createError = require('http-errors');
 const Medicine = require('../models/medicine');
 const { ObjectId } = require('bson');
 
-// ➕ إضافة دواء مفقود
 const createMedicine = (req, res, next) => {
     const validation = Medicine.validate(req.body);
     if (validation.error) {
@@ -23,7 +22,6 @@ const createMedicine = (req, res, next) => {
     });
 };
 
-// 📄 جلب كل الأدوية المفقودة
 const getAllMedicines = (req, res, next) => {
     Medicine.getAll()
         .then(medicines => {
@@ -32,7 +30,6 @@ const getAllMedicines = (req, res, next) => {
         .catch(err => next(createError(500, err.message)));
 };
 
-// 📄 جلب دواء مفقود حسب ID
 const getMedicineById = (req, res, next) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {
@@ -47,7 +44,6 @@ const getMedicineById = (req, res, next) => {
         .catch(err => next(createError(500, err.message)));
 };
 
-// ✏️ تعديل دواء مفقود
 const updateMedicine = (req, res, next) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {
@@ -69,7 +65,6 @@ const updateMedicine = (req, res, next) => {
         .catch(err => next(createError(500, err.message)));
 };
 
-// 🗑️ حذف دواء مفقود
 const deleteMedicine = (req, res, next) => {
     const { id } = req.params;
     if (!ObjectId.isValid(id)) {

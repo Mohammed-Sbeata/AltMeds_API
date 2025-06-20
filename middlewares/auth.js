@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
     const token = req.cookies?.token;
 
     if (!token) {
-        return next(createError(401, 'توكن غير موجود'));
+        return next(createError(401, 'Token is Not Exist...'));
     }
 
     const secret = process.env.PRIVATE_KEY;
@@ -16,6 +16,6 @@ module.exports = (req, res, next) => {
         req._reviewer_id = decode._reviewer_id;
         next();
     } catch (err) {
-        return next(createError(401, 'توكن غير صالح'));
+        return next(createError(401, 'Token Error.. '));
     }
 };

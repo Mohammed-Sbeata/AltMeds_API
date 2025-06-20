@@ -2,7 +2,6 @@ const createError = require('http-errors');
 const {Pharmacy} = require('../models');
 const { ObjectId } = require('bson');
 
-// 🔄 إنشاء صيدلية جديدة
 const createPharmacy = (req, res, next) => {
     const { error } = Pharmacy.validate(req.body);
     if (error) {
@@ -15,7 +14,7 @@ const createPharmacy = (req, res, next) => {
             res.status(201).json({
                 status: true,
                 _id: status._id,
-                message: 'تمت إضافة الصيدلية بنجاح.'
+                message: 'Pharmacy Added Seccessfully ...'
             });
         } else {
             next(createError(500, status.message));
@@ -23,7 +22,6 @@ const createPharmacy = (req, res, next) => {
     });
 };
 
-// 📥 جلب جميع الصيدليات
 const getAllPharmacies = async (req, res, next) => {
     try {
         const pharmacies = await Pharmacy.getAll();
@@ -38,24 +36,23 @@ const getPharmacyById = async (req, res, next) => {
     const { id } = req.params;
 
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'معرّف الصيدلية غير صالح'));
+        return next(createError(400, 'Pharmacy Id Not Corrcet'));
     }
 
     try {
         const pharmacy = await Pharmacy.getById(id);
-        if (!pharmacy) return next(createError(404, 'لم يتم العثور على الصيدلية'));
+        if (!pharmacy) return next(createError(404, 'Pharmacy is Not Exist...'));
         res.status(200).json(pharmacy);
     } catch (err) {
         next(createError(500, err.message));
     }
 };
 
-// ✏️ تحديث صيدلية
 const updatePharmacy = async (req, res, next) => {
     const { id } = req.params;
 
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'معرّف الصيدلية غير صالح'));
+        return next(createError(400, 'Pharmacy Id Not Corrcet'));
     }
 
     const { error } = Pharmacy.validate(req.body);
@@ -66,30 +63,29 @@ const updatePharmacy = async (req, res, next) => {
     try {
         const result = await Pharmacy.update(id, req.body);
         if (!result.modified) {
-            return next(createError(404, 'لم يتم العثور على الصيدلية أو لم يتم تعديلها'));
+            return next(createError(404, 'Pharmacy is Not Exist Or Not Updated...'));
         }
 
-        res.status(200).json({ status: true, message: 'تم تعديل بيانات الصيدلية بنجاح' });
+        res.status(200).json({ status: true, message: 'Pharmacy Updated Successfully' });
     } catch (err) {
         next(createError(500, err.message));
     }
 };
 
-// 🗑️ حذف صيدلية
 const deletePharmacy = async (req, res, next) => {
     const { id } = req.params;
 
     if (!ObjectId.isValid(id)) {
-        return next(createError(400, 'معرّف الصيدلية غير صالح'));
+        return next(createError(400, 'Pharmacy Id Not Corrcet'));
     }
 
     try {
         const result = await Pharmacy.delete(id);
         if (!result.deleted) {
-            return next(createError(404, 'لم يتم العثور على الصيدلية'));
+            return next(createError(404, 'Pharmacy is Not Exist ...'));
         }
 
-        res.status(200).json({ status: true, message: 'تم حذف الصيدلية بنجاح' });
+        res.status(200).json({ status: true, message: 'Pharmacy Deleted Successfully' });
     } catch (err) {
         next(createError(500, err.message));
     }

@@ -6,25 +6,25 @@ const altMedicineValidator = Joi.object({
         .max(100)
         .required()
         .messages({
-            'string.base': 'اسم الدواء يجب أن يكون نصاً',
-            'string.empty': 'اسم الدواء مطلوب',
-            'string.min': 'اسم الدواء قصير جداً',
-            'string.max': 'اسم الدواء طويل جداً',
-            'any.required': 'اسم الدواء مطلوب'
+            'string.base': 'Name Medicine must be string',
+            'string.empty': 'Name Medicine Not Empty',
+            'string.min': 'Name Medicine is very Minimum',
+            'string.max': 'Name Medicine is very Maximum',
+            'any.required': 'Nmae Medicine is requiered'
         }),
 
     description: Joi.string()
         .max(1000)
         .allow('')
         .messages({
-            'string.max': 'الوصف طويل جداً'
+            'string.max': 'description is very Maximum'
         }),
 
     originalMedicineId: Joi.string()
         .required()
         .messages({
-            'string.empty': 'رقم تعريف الدواء الأصلي مطلوب',
-            'any.required': 'رقم تعريف الدواء الأصلي مطلوب'
+            'string.empty': 'PharmacyId is Not empty',
+            'any.required': 'PharmacyId is requiered'
         }),
 
     pharmacyIds: Joi.array()
@@ -32,9 +32,9 @@ const altMedicineValidator = Joi.object({
         .min(1)
         .required()
         .messages({
-            'array.base': 'قائمة الصيدليات يجب أن تكون مصفوفة',
-            'array.min': 'يجب تحديد صيدلية واحدة على الأقل',
-            'any.required': 'يجب تحديد صيدليات توفر الدواء البديل'
+            'array.base': 'Pharmacies must be Array',
+            'array.min': 'Must be Select At Least one PharmacyId',
+            'any.required': 'Must be Select At Least one AltMed PharmacyId'
         })
 });
 

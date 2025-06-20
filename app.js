@@ -1,16 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const createError = require('http-errors');
-const { returnJson } = require('./my_modules/json_response');
 const middleware = require('./middlewares');
 const routes = require('./routes');
 const cookieParser = require('cookie-parser');
 
-global.returnJson = returnJson;
 
 const app = express();
 
-// إضافة ميدلوير لتحليل الكوكيز
 app.use(cookieParser());
 
 process.on('unhandledRejection', (reason) => {
@@ -18,22 +15,14 @@ process.on('unhandledRejection', (reason) => {
     process.exit(1);
 });
 
-/**
- * Middlewares
- */
 middleware.global(app);
 
-/**
- * Routes
- */
 routes(app);
 
-// معالجة الأخطاء: صفحة غير موجودة (404)
 app.use((req, res, next) => {
     next(createError(404));
 });
 
-// معالج الأخطاء العام مع ضبط statusCode افتراضي
 app.use((error, req, res, next) => {
     console.error(error);
     res.status(error.statusCode || 500).json({
